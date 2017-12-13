@@ -1,4 +1,3 @@
-
 First, we need to create a JS file while represents or emulates our database system on the client-side.
 Here's how you do that.
 
@@ -7,7 +6,7 @@ import db from "isotropy-lib-db";
 
 export default db.create({
   customers: [
-    {      
+    {
       name: "Jenna Maroney",
       occupation: "Actor"
     },
@@ -16,7 +15,7 @@ export default db.create({
       occupation: "Producer"
     }
   ]
-})
+});
 ```
 
 Usage is easy. Start by importing the file you just created.
@@ -59,5 +58,11 @@ await db().table("customers").update(c => c.name === "Kenneth Parcell", { occupa
 
 //Count
 const count = await db().table("customers").count();
-```
 
+//Join
+const customers = db()
+  .table(t => t.customers)
+  .leftJoin(t => t.orders).on(({ c, o }) => c.id === o.customerId)
+  .groupBy(({ c }) => c.id)
+  .filter(({ c, o }) => c.name === "Jeswin" && sql.sum(o.total))
+```
