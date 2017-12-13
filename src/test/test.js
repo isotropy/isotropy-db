@@ -95,41 +95,43 @@ describe("Isotropy FS", () => {
   });
 
   it(`Returns all records from table`, async () => {
-    const results = db(connStr)
-      .table("employees")
-      .toArray();
+    // const results = db(connStr)
+    //   .table("employees")
+    //   .toArray();
+    const results = db(connStr).employees.toArray();
     results.length.should.equal(7);
   });
 
   it(`Inserts a new record`, async () => {
-    const id = await db(connStr)
-      .table("orders")
-      .insert({
-        item: "Pampers",
-        quantity: 5,
-        price: 10,
-        employeeId: 6
-      });
+    const id = await db(connStr).employees.insert({
+      item: "Pampers",
+      quantity: 5,
+      price: 10,
+      employeeId: 6
+    });
 
-    table("orders").rows.length.should.equal(6);
+    const id = await db(connStr).orders.insert({
+      item: "Pampers",
+      quantity: 5,
+      price: 10,
+      employeeId: 6
+    });
+
+    data.orders.rows.length.should.equal(6);
   });
 
   it(`Updates a record`, async () => {
-    await db(connStr)
-      .table("employees")
-      .update(x => x.name === "Jack Donaghy", {
-        job: "CEO"
-      });
+    await db(connStr).employees.update(x => x.name === "Jack Donaghy", {
+      job: "CEO"
+    });
 
-    table("employees")
-      .rows.find(x => x.name === "Jack Donaghy")
+    data.employees.rows
+      .find(x => x.name === "Jack Donaghy")
       .job.should.equal("CEO");
   });
 
   it(`Deletes a record`, async () => {
-    await db(connStr)
-      .table("orders")
-      .delete(x => x.name === "Jack Donaghy");
+    await db(connStr.orders.delete(x => x.name === "Jack Donaghy");
 
     table("employees").rows.every(x => x.name !== "Jack Donaghy");
   });
