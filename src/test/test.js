@@ -131,15 +131,14 @@ describe("Isotropy FS", () => {
   });
 
   it(`Deletes a record`, async () => {
-    await db(connStr.orders.delete(x => x.name === "Jack Donaghy");
+    await db(connStr).orders.delete(x => x.name === "Jack Donaghy");
 
     table("employees").rows.every(x => x.name !== "Jack Donaghy");
   });
 
   it(`Filters with a predicate`, async () => {
     const results = await db(connStr)
-      .table("employees")
-      .filter(x => x.fans >= 5000)
+      .employees.filter(x => x.fans >= 5000)
       .toArray();
 
     results.length.should.equal(4);
@@ -147,8 +146,7 @@ describe("Isotropy FS", () => {
 
   it(`Sorts`, async () => {
     const results = await db(connStr)
-      .table("employees")
-      .orderBy("fans")
+      .employees.orderBy("fans")
       .toArray();
 
     results.length.should.equal(6);
@@ -157,8 +155,7 @@ describe("Isotropy FS", () => {
 
   it(`Sorts Descending`, async () => {
     const results = await db(connStr)
-      .table("employees")
-      .orderBy("fans")
+      .employees.orderBy("fans")
       .toArray();
 
     results.length.should.equal(6);
