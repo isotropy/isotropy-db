@@ -11,15 +11,15 @@
     "debug": "mocha dist/test/test.js --debug-brk"
   },
   "main": "dist/isotropy-db.js",
-  "dependencies": {},
+  "dependencies": {
+    "lazy-linq": "^1.0.3"
+  },
   "devDependencies": {
-    "babel-core": "^6.22.1",
-    "babel-preset-modern-browsers": "^10.0.1",
-    "babel-preset-stage-3": "^6.24.1",
-    "isotropy-plugin-dev-utils": "^0.0.6",
+    "@types/mocha": "^2.2.44",
+    "@types/node": "^8.0.57",
+    "@types/should": "^11.2.0",
     "mocha": "*",
-    "should": "*",
-    "source-map-support": "^0.4.8"
+    "should": "*"
   },
   "license": "MIT"
 }

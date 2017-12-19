@@ -1,34 +1,28 @@
 import should from "should";
-import * as db from "../isotropy-db";
-import data from "./data";
+import db from "./db";
 
 const connectionString = "Server=127.0.0.1;Port=5432;Database=myDataBase;"
 
 describe("Isotropy FS", () => {
   beforeEach(() => {
-    new db()
-    db.init(data);
+    db.__reset(data);
   });
 
-  it(`Creates a connection`, async () => {
-    const myDb = db.open(connString);
-    myDb.connectionString.should.equal(connStr);
+  it(`Returns all records from table`, async () => {
+    const context = db.open();
+    context.employees.toArray();
+    results.length.should.equal(7);
   });
-
-  // it(`Returns all records from table`, async () => {
-  //   const results = db.open(connString).employees.toArray();
-  //   results.length.should.equal(7);
-  // });
 
   // it(`Inserts a new record`, async () => {
-  //   const id = await db.open(connString).employees.insert({
+  //   const id = await db.open().employees.insert({
   //     item: "Pampers",
   //     quantity: 5,
   //     price: 10,
   //     employeeId: 6
   //   });
 
-  //   const id = await db.open(connString).orders.insert({
+  //   const id = await db.open().orders.insert({
   //     item: "Pampers",
   //     quantity: 5,
   //     price: 10,
@@ -39,7 +33,7 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Updates a record`, async () => {
-  //   await db.open(connString).employees.update(x => x.name === "Jack Donaghy", {
+  //   await db.open().employees.update(x => x.name === "Jack Donaghy", {
   //     job: "CEO"
   //   });
 
@@ -49,12 +43,12 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Deletes a record`, async () => {
-  //   await db.open(connString).orders.delete(x => x.name === "Jack Donaghy");
+  //   await db.open().orders.delete(x => x.name === "Jack Donaghy");
   //   table("employees").rows.every(x => x.name !== "Jack Donaghy");
   // });
 
   // it(`Filters with a predicate`, async () => {
-  //   const results = await db.open(connString)
+  //   const results = await db.open()
   //     .employees.filter(x => x.fans >= 5000)
   //     .toArray();
 
@@ -62,7 +56,7 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Sorts`, async () => {
-  //   const results = await db.open(connString)
+  //   const results = await db.open()
   //     .employees.orderBy("fans")
   //     .toArray();
 
@@ -71,7 +65,7 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Sorts Descending`, async () => {
-  //   const results = await db.open(connString)
+  //   const results = await db.open()
   //     .employees.orderBy("fans")
   //     .toArray();
 
@@ -80,7 +74,7 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Sorts on multiple fields (ascending + ascending)`, async () => {
-  //   const results = await db.open(connString)
+  //   const results = await db.open()
   //     .table("employees")
   //     .orderBy("fans")
   //     .thenByDescending("name")
@@ -91,7 +85,7 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Sorts on multiple fields (ascending + descending)`, async () => {
-  //   const results = await db.open(connString)
+  //   const results = await db.open()
   //     .table("employees")
   //     .orderBy("fans")
   //     .thenByDescending("name")
@@ -102,7 +96,7 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Slices results`, async () => {
-  //   const results = await db.open(connString)
+  //   const results = await db.open()
   //     .table("employees")
   //     .slice(2, 3)
   //     .toArray();
@@ -113,7 +107,7 @@ describe("Isotropy FS", () => {
   // });
 
   // it(`Fetches specific fields`, async () => {
-  //   const results = await db.open(connString)
+  //   const results = await db.open()
   //     .table("employees")
   //     .map(x => ({ name: x.name, job: x.job }))
   //     .toArray();
