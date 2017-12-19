@@ -2,8 +2,11 @@ import should from "should";
 import * as db from "../isotropy-db";
 import data from "./data";
 
+const connectionString = "Server=127.0.0.1;Port=5432;Database=myDataBase;"
+
 describe("Isotropy FS", () => {
   beforeEach(() => {
+    new db()
     db.init(data);
   });
 

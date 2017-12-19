@@ -5,7 +5,7 @@ class DbContext {
 }
 
 export function init(connectionString, data) {
-
+  
 }
 
 export function open(connectionString) {
