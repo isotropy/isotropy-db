@@ -1,26 +1,39 @@
-import should from "should";
+require("should");
 import db from "./db";
 
-const connectionString = "Server=127.0.0.1;Port=5432;Database=myDataBase;"
+const connectionString = "Server=127.0.0.1;Port=5432;Database=myDataBase;";
 
 describe("Isotropy FS", () => {
   beforeEach(() => {
-    db.__reset(data);
+    db.__reset();
   });
 
   it(`Returns all records from table`, async () => {
-    const context = db.open();
-    context.employees.toArray();
-    results.length.should.equal(7);
+    const context = await db.open();
+    const results = context.tables.employees.toArray();
+    results.length.should.equal(6);
+  });
+
+  it(`Where clause`, async () => {
+    const context = await db.open();
+    const results = context.tables.employeesemployees
+      .where(e => e.fans >= 8000)
+      .toArray();
+    results.length.should.equal(3);
+  });
+
+  it(`Inserts a record`, async () => {
+    const context = await db.open();
+    context.insert(t => t.orders, {
+      item: "Pampers",
+      quantity: 5,
+      price: 10,
+      employeeId: 6
+    });
   });
 
   // it(`Inserts a new record`, async () => {
-  //   const id = await db.open().employees.insert({
-  //     item: "Pampers",
-  //     quantity: 5,
-  //     price: 10,
-  //     employeeId: 6
-  //   });
+  //   const id = await db.open().employees.insert();
 
   //   const id = await db.open().orders.insert({
   //     item: "Pampers",
