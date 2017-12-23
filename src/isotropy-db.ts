@@ -17,6 +17,7 @@ function random() {
 }
 
 class Db {
+  state: string;
   server: DbServer;
   cursors: {
     [key: string]: number;
@@ -24,6 +25,7 @@ class Db {
   tables: Enumerables;
 
   constructor(server: DbServer, tables: Enumerables) {
+    this.state = "CLOSED";
     this.server = server;
     this.tables = Object.keys(tables).reduce(
       (acc, tableName) => ({
@@ -45,6 +47,10 @@ class Db {
     return this.tables;
   }
 
+  async close() {
+    this.state = "CLOSED";
+  }
+
   async delete(getTable, selector) {
     const table = getTable(this.tables);
     this.tables = Object.keys(this.tables).reduce(
@@ -53,6 +59,20 @@ class Db {
         [tableName]:
           this.tables[tableName] === table
             ? table.where(row => !selector(row))
+            : this.tables[tableName]
+      }),
+      {}
+    );
+  }
+
+  async dropTable(getTable) {
+    const table = getTable(this.tables);
+    this.tables = Object.keys(this.tables).reduce(
+      (acc, tableName) => ({
+        ...acc,
+        [tableName]:
+          this.tables[tableName] === table
+            ? linq.asEnumerable([])
             : this.tables[tableName]
       }),
       {}
@@ -69,18 +89,16 @@ class Db {
         }))
       : [{ ..._item, __id: this.__updateNextId(table) }];
 
-    for (const item of items) {
-      this.tables = Object.keys(this.tables).reduce(
-        (acc, tableName) => ({
-          ...acc,
-          [tableName]:
-            this.tables[tableName] === table
-              ? table.concat(items)
-              : this.tables[tableName]
-        }),
-        {}
-      );
-    }
+    this.tables = Object.keys(this.tables).reduce(
+      (acc, tableName) => ({
+        ...acc,
+        [tableName]:
+          this.tables[tableName] === table
+            ? table.concat(items)
+            : this.tables[tableName]
+      }),
+      {}
+    );
   }
 
   async update(getTable, selector, props) {
@@ -95,6 +113,10 @@ class Db {
       }),
       {}
     );
+  }
+
+  async open() {
+    this.state = "OPEN";
   }
 
   __getTableName(table) {
@@ -137,6 +159,7 @@ export default class DbServer {
   }
 
   async open() {
+    await this.db.open();
     return this.db;
   }
 }
