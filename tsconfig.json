@@ -6,10 +6,14 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "lib": ["es2017"],
+    "lib": [
+      "es2017"
+    ],
     "sourceMap": true,
     "strict": true,
     "noImplicitAny": false
   },
-  "include": ["./src/**/*"]
+  "include": [
+    "./src/**/*"
+  ]
 }
