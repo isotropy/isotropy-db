@@ -1,10 +1,10 @@
-import IsotropyDb from "../isotropy-db";
+import { db, table } from "../isotropy-db";
 
-const db: any = new IsotropyDb({
-  employees: [
+export default db({
+  employees: table([
     {
       __id: 1,
-     name: "Liz Lemon",
+      name: "Liz Lemon",
       job: "Head Writer",
       fans: 10000
     },
@@ -38,7 +38,7 @@ const db: any = new IsotropyDb({
       job: "Actor",
       fans: 5000
     }
-  ],
+  ]),
   orders: [
     {
       __id: 1,
@@ -69,6 +69,4 @@ const db: any = new IsotropyDb({
       employeeId: "2"
     }
   ]
-}) as any;
-
-export default db;
+})

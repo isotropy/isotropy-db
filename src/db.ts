@@ -1,10 +1,6 @@
 import linq = require("lazy-linq");
 import { DbServer } from "./isotropy-db";
 
-type Tables<T> = {
-  [P in keyof T]: Enumerable<T>
-}
-
 function random() {
   var text = "";
   var possible =
@@ -16,29 +12,23 @@ function random() {
   return text;
 }
 
-export default class Db<T> {
+export default class Db<T extends { [key: string]: any }> {
   state: string;
   server: DbServer<T>;
   cursors: {
     [key: string]: number;
   };
-  tables: Tables<T>;
+  tables: T;
 
-  constructor(server: DbServer<T>, data: T) {
+  constructor(server: DbServer<T>, tables: T) {
     this.state = "CLOSED";
     this.server = server;
-    this.tables = Object.keys(data).reduce(
-      (acc, tableName) => ({
-        ...acc,
-        [tableName]: linq.asEnumerable(data[tableName])
-      }),
-      {}
-    ) as Tables<T>;
+    this.tables = tables;
 
-    this.cursors = Object.keys(data).reduce(
+    this.cursors = Object.keys(tables).reduce(
       (acc, tableName) => ({
         ...acc,
-        [tableName]: data[tableName].length
+        [tableName]: tables[tableName].length
       }),
       {}
     );
@@ -63,12 +53,12 @@ export default class Db<T> {
             : this.tables[tableName]
       }),
       {}
-    ) as Tables<T>;
+    ) as T;
   }
 
   async dropTable(getTable) {
     const table = getTable(this.tables);
-    
+
     this.tables = Object.keys(this.tables).reduce(
       (acc, tableName) => ({
         ...acc,
@@ -78,7 +68,7 @@ export default class Db<T> {
             : this.tables[tableName]
       }),
       {}
-    ) as Tables<T>;
+    ) as T;
   }
 
   async insert(getTable, _item) {
@@ -100,11 +90,12 @@ export default class Db<T> {
             : this.tables[tableName]
       }),
       {}
-    );
+    ) as T;
   }
 
   async update(getTable, selector, props) {
     const table = getTable(this.tables);
+
     this.tables = Object.keys(this.tables).reduce(
       (acc, tableName) => ({
         ...acc,
@@ -114,7 +105,7 @@ export default class Db<T> {
             : this.tables[tableName]
       }),
       {}
-    );
+    ) as T;
   }
 
   async open() {

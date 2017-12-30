@@ -1,5 +1,6 @@
-require("should");
-import server from "./dbserver";
+import "mocha";
+import "should";
+import server from "./db";
 
 const connectionString = "Server=127.0.0.1;Port=5432;Database=myDataBase;";
 

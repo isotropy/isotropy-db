@@ -11,7 +11,14 @@
     ],
     "sourceMap": true,
     "strict": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
+    "types": [
+      "lazy-linq"
+    ]
   },
   "include": [
     "./src/**/*"

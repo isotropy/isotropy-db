@@ -1,16 +1,17 @@
 import Db from "./db";
+import linq = require("lazy-linq")
 
 export class DbServer<T> {
-  originalTables: T;
+  tables: T;
   db: Db<T>;
 
-  constructor(data: T) {
-    this.data = data;
+  constructor(tables: T) {
+    this.tables = tables;
     this.__reset();
   }
 
   __reset() {
-    this.db = new Db<T>(this, this.data);
+    this.db = new Db<T>(this, this.tables);
   }
 
   async open() {
@@ -19,6 +20,10 @@ export class DbServer<T> {
   }
 }
 
-export default function create<T>(data: T) : DbServer<T> {
-  return new DbServer<T>(data);
+export function table<T>(rows: T[]) : IEnumerable<T> {
+  return linq.asEnumerable(rows);
+}
+
+export function db<T>(tables: T) : DbServer<T> {
+  return new DbServer<T>(tables);
 }
