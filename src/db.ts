@@ -1,6 +1,12 @@
 import linq = require("lazy-linq");
 import { DbServer } from "./isotropy-db";
 
+type Diff<T extends string, U extends string> = ({ [P in T]: P } &
+  { [P in U]: never } & { [x: string]: never })[T];
+type Omit<T, K extends keyof T> = { [P in Diff<keyof T, K>]: T[P] };
+
+type RowBase = { __id: number };
+
 function random() {
   var text = "";
   var possible =
@@ -12,7 +18,7 @@ function random() {
   return text;
 }
 
-export default class Db<T extends { [key: string]: any }> {
+export default class Db<T> {
   state: string;
   server: DbServer<T>;
   cursors: {
@@ -28,7 +34,7 @@ export default class Db<T extends { [key: string]: any }> {
     this.cursors = Object.keys(tables).reduce(
       (acc, tableName) => ({
         ...acc,
-        [tableName]: tables[tableName].length
+        [tableName]: tables[tableName].orderBy(t => t.__id).last().__id
       }),
       {}
     );
@@ -42,8 +48,11 @@ export default class Db<T extends { [key: string]: any }> {
     this.state = "CLOSED";
   }
 
-  async delete(getTable, selector) {
-    const table = getTable(this.tables);
+  async delete<TRow extends RowBase>(
+    tableSelector: ((tables: T) => IEnumerable<TRow>),
+    selector: Predicate<TRow>
+  ) {
+    const table = tableSelector(this.tables);
     this.tables = Object.keys(this.tables).reduce(
       (acc, tableName) => ({
         ...acc,
@@ -56,8 +65,10 @@ export default class Db<T extends { [key: string]: any }> {
     ) as T;
   }
 
-  async dropTable(getTable) {
-    const table = getTable(this.tables);
+  async dropTable<TRow extends RowBase>(
+    tableSelector: ((tables: T) => IEnumerable<TRow>)
+  ) {
+    const table = tableSelector(this.tables);
 
     this.tables = Object.keys(this.tables).reduce(
       (acc, tableName) => ({
@@ -71,15 +82,41 @@ export default class Db<T extends { [key: string]: any }> {
     ) as T;
   }
 
-  async insert(getTable, _item) {
-    const table = getTable(this.tables);
+  //TODO: Remove cast
+  //Spread on generics is not supported yet.
+  //https://github.com/Microsoft/TypeScript/issues/10727
+  async insert<TRow extends RowBase>(
+    tableSelector: ((tables: T) => IEnumerable<TRow>),
+    item: Omit<TRow, "__id">
+  ) {
+    const table = tableSelector(this.tables);
 
-    const items = Array.isArray(_item)
-      ? _item.map(i => ({
-          ...i,
-          __id: this.__updateNextId(table)
-        }))
-      : [{ ..._item, __id: this.__updateNextId(table) }];
+    const items: IEnumerable<TRow> = [
+      { ...(item as any), __id: this.__updateNextId(table) }
+    ] as any;
+
+    this.tables = Object.keys(this.tables).reduce(
+      (acc, tableName) => ({
+        ...acc,
+        [tableName]:
+          this.tables[tableName] === table
+            ? table.concat(items as IEnumerable<TRow>)
+            : this.tables[tableName]
+      }),
+      {}
+    ) as T;
+  }
+
+  async insertMany<TRow extends RowBase>(
+    tableSelector: ((tables: T) => IEnumerable<TRow>),
+    rows: TRow[]
+  ) {
+    const table = tableSelector(this.tables);
+
+    const items: IEnumerable<TRow> = rows.map(i => ({
+      ...(i as any),
+      __id: this.__updateNextId(table)
+    })) as any;
 
     this.tables = Object.keys(this.tables).reduce(
       (acc, tableName) => ({
@@ -93,15 +130,22 @@ export default class Db<T extends { [key: string]: any }> {
     ) as T;
   }
 
-  async update(getTable, selector, props) {
-    const table = getTable(this.tables);
+  async update<TRow>(
+    tableSelector: ((tables: T) => IEnumerable<TRow>),
+    selector: Predicate<TRow>,
+    props: Partial<TRow>
+  ) {
+    const table = tableSelector(this.tables);
 
     this.tables = Object.keys(this.tables).reduce(
       (acc, tableName) => ({
         ...acc,
         [tableName]:
           this.tables[tableName] === table
-            ? table.select(row => (selector(row) ? { ...row, ...props } : row))
+            ? table.select(
+                row =>
+                  selector(row) ? { ...(row as any), ...(props as any) } : row
+              )
             : this.tables[tableName]
       }),
       {}
@@ -112,11 +156,11 @@ export default class Db<T extends { [key: string]: any }> {
     this.state = "OPEN";
   }
 
-  __getTableName(table) {
+  __getTableName<TRow extends RowBase>(table: IEnumerable<TRow>) {
     return Object.keys(this.tables).find(name => this.tables[name] === table);
   }
 
-  __updateNextId(table) {
+  __updateNextId<TRow extends RowBase>(table: IEnumerable<TRow>) {
     const tableName = this.__getTableName(table);
     if (tableName) {
       const nextId = this.cursors[tableName] + 1;

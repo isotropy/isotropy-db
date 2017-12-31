@@ -39,7 +39,7 @@ export default db({
       fans: 5000
     }
   ]),
-  orders: [
+  orders: table([
     {
       __id: 1,
       item: "Sabor de Soledad",
@@ -68,5 +68,5 @@ export default db({
       price: 1299,
       employeeId: "2"
     }
-  ]
-})
+  ])
+});

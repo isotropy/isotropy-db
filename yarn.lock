@@ -99,9 +99,9 @@ inherits@2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
 
-lazy-linq@^1.0.3:
+"lazy-linq@git://github.com/jeswin/lazy-linq":
   version "1.0.3"
-  resolved "https://registry.yarnpkg.com/lazy-linq/-/lazy-linq-1.0.3.tgz#fef1235d6e8e46d4da0e21ca62dbe8d52da2ba71"
+  resolved "git://github.com/jeswin/lazy-linq#5cdaa020a352558f96adcab8cf1e17c5f10871ed"
   dependencies:
     babel-runtime "^5.6.17"
 

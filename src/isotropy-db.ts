@@ -1,6 +1,10 @@
 import Db from "./db";
 import linq = require("lazy-linq")
 
+type Tables = {
+  [key: string]: IEnumerable<{ __id: number }>
+}
+
 export class DbServer<T> {
   tables: T;
   db: Db<T>;
@@ -24,6 +28,6 @@ export function table<T>(rows: T[]) : IEnumerable<T> {
   return linq.asEnumerable(rows);
 }
 
-export function db<T>(tables: T) : DbServer<T> {
+export function db<T extends Tables>(tables: T) : DbServer<T> {
   return new DbServer<T>(tables);
 }

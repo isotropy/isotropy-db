@@ -1,5 +1,5 @@
-import "mocha";
-import "should";
+require("mocha");
+require("should");
 import server from "./db";
 
 const connectionString = "Server=127.0.0.1;Port=5432;Database=myDataBase;";
@@ -36,7 +36,7 @@ describe("Isotropy FS", () => {
       item: "Pampers",
       quantity: 5,
       price: 10,
-      employeeId: 6
+      employeeId: "6"
     });
     db
       .__data()
