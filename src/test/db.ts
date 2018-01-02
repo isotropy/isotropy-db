@@ -1,4 +1,4 @@
-import { db, table } from "../isotropy-db";
+import { db, table, DbServer } from "../isotropy-db";
 
 export default db({
   employees: table([

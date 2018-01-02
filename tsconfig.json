@@ -12,9 +12,7 @@
     "sourceMap": true,
     "strict": true,
     "noImplicitAny": false,
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
+    "declaration": true,
     "types": [
       "lazy-linq",
       "should",

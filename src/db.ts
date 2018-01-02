@@ -1,11 +1,11 @@
 import linq = require("lazy-linq");
 import { DbServer } from "./isotropy-db";
 
-type Diff<T extends string, U extends string> = ({ [P in T]: P } &
+export type Diff<T extends string, U extends string> = ({ [P in T]: P } &
   { [P in U]: never } & { [x: string]: never })[T];
-type Omit<T, K extends keyof T> = { [P in Diff<keyof T, K>]: T[P] };
+export type Omit<T, K extends keyof T> = { [P in Diff<keyof T, K>]: T[P] };
 
-type RowBase = { __id: number };
+export type RowBase = { __id: number };
 
 function random() {
   var text = "";
