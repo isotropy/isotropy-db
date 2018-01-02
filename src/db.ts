@@ -1,5 +1,6 @@
 import linq = require("lazy-linq");
 import { DbServer } from "./isotropy-db";
+import exception from "./exception";
 
 export type Diff<T extends string, U extends string> = ({ [P in T]: P } &
   { [P in U]: never } & { [x: string]: never })[T];
@@ -90,6 +91,7 @@ export default class Db<T> {
     item: Omit<TRow, "__id">
   ) {
     const table = tableSelector(this.tables);
+    const tableName = this.__getTableName(table);
 
     const items: IEnumerable<TRow> = [
       { ...(item as any), __id: this.__updateNextId(table) }
@@ -105,6 +107,8 @@ export default class Db<T> {
       }),
       {}
     ) as T;
+
+    return this.cursors[tableName];
   }
 
   async insertMany<TRow extends RowBase>(
@@ -156,8 +160,13 @@ export default class Db<T> {
     this.state = "OPEN";
   }
 
-  __getTableName<TRow extends RowBase>(table: IEnumerable<TRow>) {
-    return Object.keys(this.tables).find(name => this.tables[name] === table);
+  __getTableName<TRow extends RowBase>(
+    table: IEnumerable<TRow>
+  ): string | never {
+    const tableName = Object.keys(this.tables).find(
+      name => this.tables[name] === table
+    );
+    return tableName || exception(`Cannot find table.`);
   }
 
   __updateNextId<TRow extends RowBase>(table: IEnumerable<TRow>) {

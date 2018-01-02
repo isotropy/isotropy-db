@@ -32,12 +32,13 @@ describe("Isotropy FS", () => {
 
   it(`Inserts a record`, async () => {
     const db = await server.open();
-    await db.insert(t => t.orders, {
+    const id = await db.insert(t => t.orders, {
       item: "Pampers",
       quantity: 5,
       price: 10,
       employeeId: "6"
     });
+    id.should.equal(5);
     db
       .__data()
       .orders.toArray()
