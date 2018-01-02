@@ -1,6 +1,6 @@
 {
   "name": "isotropy-db",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Isotropy Team<isotropy@agilehead.com>",
   "contributors": [
     "Jeswin Kumar<jeswinpk@agilehead.com>"
@@ -11,6 +11,7 @@
     "debug": "mocha dist/test/test.js --debug-brk"
   },
   "main": "dist/isotropy-db.js",
+  "types": "dist/isotropy-db.d.ts",
   "dependencies": {
     "lazy-linq": "git://github.com/jeswin/lazy-linq"
   },
