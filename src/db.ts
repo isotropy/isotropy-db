@@ -22,7 +22,7 @@ function random() {
 export default class Db<T> {
   state: string;
   server: DbServer<T>;
-  cursors: {
+  pkeySequences: {
     [key: string]: number;
   };
   tables: T;
@@ -32,7 +32,7 @@ export default class Db<T> {
     this.server = server;
     this.tables = tables;
 
-    this.cursors = Object.keys(tables).reduce(
+    this.pkeySequences = Object.keys(tables).reduce(
       (acc, tableName) => ({
         ...acc,
         [tableName]: tables[tableName].orderBy(t => t.__id).last().__id
@@ -108,7 +108,7 @@ export default class Db<T> {
       {}
     ) as T;
 
-    return this.cursors[tableName];
+    return this.pkeySequences[tableName];
   }
 
   async insertMany<TRow extends RowBase>(
@@ -172,11 +172,11 @@ export default class Db<T> {
   __updateNextId<TRow extends RowBase>(table: IEnumerable<TRow>) {
     const tableName = this.__getTableName(table);
     if (tableName) {
-      const nextId = this.cursors[tableName] + 1;
-      this.cursors = Object.keys(this.cursors).reduce(
+      const nextId = this.pkeySequences[tableName] + 1;
+      this.pkeySequences = Object.keys(this.pkeySequences).reduce(
         (acc, name) => ({
           ...acc,
-          [name]: name === tableName ? nextId : this.cursors[name]
+          [name]: name === tableName ? nextId : this.pkeySequences[name]
         }),
         {}
       );
