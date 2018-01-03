@@ -26,6 +26,7 @@ export default class Db<T> {
     [key: string]: number;
   };
   tables: T;
+  rollback?: T;
 
   constructor(server: DbServer<T>, tables: T) {
     this.state = "CLOSED";
@@ -45,8 +46,16 @@ export default class Db<T> {
     return this.tables;
   }
 
+  async beginTransaction() {
+    this.rollback = this.rollback || this.tables;
+  }
+
   async close() {
     this.state = "CLOSED";
+  }
+
+  async commitTransaction() {
+    this.rollback = undefined;
   }
 
   async delete<TRow extends RowBase>(
@@ -64,6 +73,14 @@ export default class Db<T> {
       }),
       {}
     ) as T;
+  }
+
+  async rollbackTransaction() {
+    this.tables =
+      this.rollback ||
+      exception(
+        `Cannot call endTransaction when there is no active transaction.`
+      );
   }
 
   async dropTable<TRow extends RowBase>(
@@ -113,9 +130,10 @@ export default class Db<T> {
 
   async insertMany<TRow extends RowBase>(
     tableSelector: ((tables: T) => IEnumerable<TRow>),
-    rows: TRow[]
+    rows: Omit<TRow, "__id">[]
   ) {
     const table = tableSelector(this.tables);
+    const tableName = this.__getTableName(table);
 
     const items: IEnumerable<TRow> = rows.map(i => ({
       ...(i as any),
@@ -132,6 +150,13 @@ export default class Db<T> {
       }),
       {}
     ) as T;
+
+    return this.tables[tableName]
+      .orderBy(x => x.__id)
+      .reverse()
+      .take(rows.length)
+      .select(x => x.__id)
+      .toArray();
   }
 
   async update<TRow>(

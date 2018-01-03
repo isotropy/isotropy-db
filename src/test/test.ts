@@ -17,7 +17,9 @@ describe("Isotropy FS", () => {
 
   it(`Makes tables Enumerable`, async () => {
     const db = await server.open();
-    const results = await db.tables.employees.where(e => e.fans >= 8000).toArray();
+    const results = await db.tables.employees
+      .where(e => e.fans >= 8000)
+      .toArray();
     results.length.should.equal(3);
   });
 
@@ -49,6 +51,27 @@ describe("Isotropy FS", () => {
       .__id.should.equal(5);
   });
 
+  it(`Inserts a record`, async () => {
+    const db = await server.open();
+
+    const id = await db.insertMany(t => t.orders, [
+      {
+        item: "Pampers",
+        quantity: 5,
+        price: 10,
+        employeeId: "6"
+      },
+      {
+        item: "Dolce and Banana",
+        quantity: 1,
+        price: 100,
+        employeeId: "6"
+      }
+    ]);
+
+    id.should.deepEqual([6, 5]);
+  });
+
   it(`Updates a record`, async () => {
     const db = await server.open();
     await db.update(t => t.employees, e => e.name === "Liz Lemon", {
@@ -65,5 +88,61 @@ describe("Isotropy FS", () => {
       .__data()
       .orders.toArray()
       .length.should.equal(0);
+  });
+
+  it(`Can do a transaction`, async () => {
+    const db = await server.open();
+
+    db.beginTransaction();
+
+    const id = await db.insertMany(t => t.orders, [
+      {
+        item: "Pampers",
+        quantity: 5,
+        price: 10,
+        employeeId: "6"
+      },
+      {
+        item: "Dolce and Banana",
+        quantity: 1,
+        price: 100,
+        employeeId: "6"
+      }
+    ]);
+
+    db.commitTransaction();
+
+    db
+      .__data()
+      .orders.toArray()
+      .length.should.equal(6);
+  });
+
+  it(`Can rollback a transaction`, async () => {
+    const db = await server.open();
+
+    db.beginTransaction();
+    
+    const id = await db.insertMany(t => t.orders, [
+      {
+        item: "Pampers",
+        quantity: 5,
+        price: 10,
+        employeeId: "6"
+      },
+      {
+        item: "Dolce and Banana",
+        quantity: 1,
+        price: 100,
+        employeeId: "6"
+      }
+    ]);
+
+    db.rollbackTransaction();
+
+    db
+      .__data()
+      .orders.toArray()
+      .length.should.equal(4);
   });
 });
