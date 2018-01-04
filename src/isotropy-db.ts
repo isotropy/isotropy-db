@@ -2,7 +2,7 @@ import Db from "./db";
 import linq = require("lazy-linq")
 
 export type Tables = {
-  [key: string]: IEnumerable<{ __id: number }>
+  [key: string]: IEnumerable<{ __id: string }>
 }
 
 export class DbServer<T> {

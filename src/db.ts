@@ -6,7 +6,7 @@ export type Diff<T extends string, U extends string> = ({ [P in T]: P } &
   { [P in U]: never } & { [x: string]: never })[T];
 export type Omit<T, K extends keyof T> = { [P in Diff<keyof T, K>]: T[P] };
 
-export type RowBase = { __id: number };
+export type RowBase = { __id: string };
 
 function random() {
   var text = "";
@@ -36,7 +36,7 @@ export default class Db<T> {
     this.pkeySequences = Object.keys(tables).reduce(
       (acc, tableName) => ({
         ...acc,
-        [tableName]: tables[tableName].orderBy(t => t.__id).last().__id
+        [tableName]: parseInt(tables[tableName].orderBy(t => t.__id).last().__id)
       }),
       {}
     );

@@ -77,8 +77,28 @@ describe("Isotropy FS", () => {
     await db.update(t => t.employees, e => e.name === "Liz Lemon", {
       name: "Elizabeth Miervaldis Lemon"
     });
-    const liz = db.__data().employees.first(i => i.__id === 1);
+    const liz = db.__data().employees.first(i => i.__id === "1");
     liz.name.should.equal("Elizabeth Miervaldis Lemon");
+  });
+
+  it(`Does a join`, async () => {
+    const db = await server.open();
+    const lemonsOrders = db.tables.employees
+      .join(
+        db.tables.orders,
+        e => e.__id,
+        o => o.employeeId,
+        (e, o) => ({
+          name: e.name,
+          order: o.item
+        })
+      )
+      .where(e => e.name === "Liz Lemon")
+      .toArray();
+    lemonsOrders.should.deepEqual([
+      { name: "Liz Lemon", order: "Sabor de Soledad" },
+      { name: "Liz Lemon", order: "iPhone X" }
+    ]);
   });
 
   it(`Drops a table`, async () => {
@@ -122,7 +142,7 @@ describe("Isotropy FS", () => {
     const db = await server.open();
 
     db.beginTransaction();
-    
+
     const id = await db.insertMany(t => t.orders, [
       {
         item: "Pampers",
