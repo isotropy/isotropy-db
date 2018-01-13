@@ -1,5 +1,5 @@
 import Db from "./db";
-import linq = require("lazy-linq")
+import linq = require("lazy-linq-with-types")
 
 export type Tables = {
   [key: string]: IEnumerable<{ __id: string }>

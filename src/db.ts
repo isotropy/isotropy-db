@@ -1,4 +1,4 @@
-import linq = require("lazy-linq");
+import linq = require("lazy-linq-with-types");
 import { DbServer } from "./isotropy-db";
 import exception from "./exception";
 

@@ -14,7 +14,7 @@
     "noImplicitAny": false,
     "declaration": true,
     "types": [
-      "lazy-linq",
+      "lazy-linq-with-types",
       "should",
       "mocha",
       "node"
